@@ -3,8 +3,8 @@ var router = express.Router();
 var axios = require('axios');
 
 router.post('/sms', async (req, res) => {
-  const messageBody = req.body.text;
-  const fromNumber = req.body.msisdn;
+  const messageBody = req.body.Body;
+  const fromNumber = req.body.From;
   try {
     if (!messageBody || !fromNumber) throw "No sms body";
     if (!process.env.OPEN_AI_KEY) throw "No OpenAI Key";
@@ -27,22 +27,13 @@ router.post('/sms', async (req, res) => {
     );
 
     const responseText = openaiResponse.data.choices[0].message.content;
-    
-    const Vonage = require('@vonage/server-sdk'); // Install the Vonage SDK using npm install @vonage/server-sdk
-    const vonage = new Vonage({
-      apiKey: process.env.VONAGE_KEY,
-      apiSecret: process.env.VONAGE_SECRET,
-    });
-    let responseFinal = await vonage.sms.send({to, from, responseMessage}).then(resp => {
-      console.log('Message sent successfully');
-      console.log(resp);
-    }).catch(err => {
-      console.log('There was an error sending the messages.');
-      console.error(err);
-    });
+    const responseMessage = `ChatGPT: ${responseText}`;
+    const { MessagingResponse } = require('twilio').twiml;
+    const twiml = new MessagingResponse();
+    twiml.message(responseMessage);
 
-    res.send(responseFinal);
-} catch (error) {
+    res.type('text/xml').send(twiml.toString());
+  } catch (error) {
     console.error(error);
     res.status(500).send('Error sending response');
   }
