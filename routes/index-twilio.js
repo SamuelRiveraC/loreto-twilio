@@ -3,9 +3,15 @@ var router = express.Router();
 var axios = require('axios');
 
 router.post('/sms', async (req, res) => {
-  const messageBody = req.body.Body;
-  const fromNumber = req.body.From;
+  const messageBody = req.body.text;
+  const fromNumber = req.body.msisdn;
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    if (!verifySignature(token, privateKey)) {
+      throw "Invalid signature";
+    }
+
+    
     if (!messageBody || !fromNumber) throw "No sms body";
     if (!process.env.OPEN_AI_KEY) throw "No OpenAI Key";
     
