@@ -3,11 +3,16 @@ var router = express.Router();
 var axios = require('axios');
 
 router.post('/sms', async (req, res) => {
-  const messageBody = req.body.text;
-  const fromNumber = req.body.msisdn;
   try {
+    // const token = req.headers.authorization.split(" ")[1];
+    // if (!verifySignature(token, privateKey)) {
+    //   throw "Invalid signature";
+    // }
+    const messageBody = req.body.text;
+    const fromNumber = req.body.msisdn;
     if (!messageBody || !fromNumber) throw "No sms body";
     if (!process.env.OPEN_AI_KEY) throw "No OpenAI Key";
+    if (!messageBody.includes('gpt')) throw "This is not a message for the api"
     
     const openaiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo-16k',
