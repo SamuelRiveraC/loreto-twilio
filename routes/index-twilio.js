@@ -14,6 +14,7 @@ router.post('/sms', async (req, res) => {
     
     if (!messageBody || !fromNumber) throw "No sms body";
     if (!process.env.OPEN_AI_KEY) throw "No OpenAI Key";
+    if (!messageBody.includes('gpt')) throw "This is not a message for the api"
     
     const openaiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo-16k',
