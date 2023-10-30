@@ -41,6 +41,7 @@ router.post('/sms', async (req, res) => {
 
     let responseFinal = await vonage.sms.send({to: userNumber, from: process.env.APP_NUMBER, text: appMessage}).then(resp => {
       console.log('Message sent successfully');
+      console.log({to: userNumber, from: process.env.APP_NUMBER, fromtext: userMessage, totext: appMessage});
       console.log(resp);
     }).catch(err => {
       console.log('There was an error sending the messages.');
