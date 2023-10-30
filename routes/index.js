@@ -49,7 +49,7 @@ router.post('/sms', async (req, res) => {
     res.send(responseFinal);
 } catch (error) {
     console.error(error);
-    res.status(500).send('Error sending response');
+    res.status(500).send({msg: 'Error sending response', error});
   }
 });
 module.exports = router;
