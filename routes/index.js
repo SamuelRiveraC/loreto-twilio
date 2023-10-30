@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var axios = require('axios');
 
+router.get('/', async (req, res) => {
+  res.send("SMS AI");
+});
+
 router.post('/sms', async (req, res) => {
   try {
     // const token = req.headers.authorization.split(" ")[1];
