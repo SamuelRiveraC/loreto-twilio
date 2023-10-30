@@ -33,7 +33,7 @@ router.post('/sms', async (req, res) => {
 
     const responseText = openaiResponse.data.choices[0].message.content;
     
-    const Vonage = require('@vonage/server-sdk'); // Install the Vonage SDK using npm install @vonage/server-sdk
+    const { Vonage } = require('@vonage/server-sdk')
     const vonage = new Vonage({
       apiKey: process.env.VONAGE_KEY,
       apiSecret: process.env.VONAGE_SECRET,
