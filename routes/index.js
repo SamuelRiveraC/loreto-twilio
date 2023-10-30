@@ -50,7 +50,9 @@ router.post('/sms', async (req, res) => {
 
     res.send(responseFinal);
 } catch (error) {
+    console.error('Message error');
     console.error(error);
+    console.log({to: userNumber, from: process.env.APP_NUMBER, fromtext: userMessage});
     res.status(500).send({msg: 'Error sending response', error});
   }
 });
