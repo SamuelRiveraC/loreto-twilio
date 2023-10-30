@@ -8,17 +8,17 @@ router.post('/sms', async (req, res) => {
     // if (!verifySignature(token, privateKey)) {
     //   throw "Invalid signature";
     // }
-    const messageBody = req.body.text;
-    const fromNumber = req.body.msisdn;
-    if (!messageBody || !fromNumber) throw "No sms body";
+    const userMessage = req.body.text;
+    const userNumber = req.body.msisdn;
+    if (!userMessage || !userNumber) throw "No sms body";
     if (!process.env.OPEN_AI_KEY) throw "No OpenAI Key";
-    if (!messageBody.includes('gpt')) throw "This is not a message for the api"
+    if (!userMessage.includes('gpt')) throw "This is not a message for the api"
     
     const openaiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo-16k',
         messages: [
           { role: 'system', content: 'You are a helpful assistant. Please respond with a brief and concise answer suitable for an SMS' },
-          { role: 'user', content: messageBody }
+          { role: 'user', content: userMessage }
         ],
         temperature: 0.8,
         max_tokens: 1500,
@@ -30,15 +30,16 @@ router.post('/sms', async (req, res) => {
         headers: { 'Authorization': `Bearer ${process.env.OPEN_AI_KEY}`, 'Content-Type': 'application/json' }
       }
     );
-
-    const responseText = openaiResponse.data.choices[0].message.content;
+    const appMessage = openaiResponse.data.choices[0].message.content;
     
     const { Vonage } = require('@vonage/server-sdk')
     const vonage = new Vonage({
       apiKey: process.env.VONAGE_KEY,
       apiSecret: process.env.VONAGE_SECRET,
     });
-    let responseFinal = await vonage.sms.send({to, from, responseMessage}).then(resp => {
+    
+
+    let responseFinal = await vonage.sms.send({to: userNumber, from: process.env.APP_NUMBER, text: appMessage}).then(resp => {
       console.log('Message sent successfully');
       console.log(resp);
     }).catch(err => {
